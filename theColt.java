@@ -1633,10 +1633,9 @@ public class theColt extends LinearOpMode{
     }
     public double getRobotPositionXSonar()
     {
-        double voltageSonar=distanceSensorXSonar.getVoltage();
-        double distance=6+(voltageSonar / 0.006);
-//        telemetry.log().add("voltage = %d, distance = %d", voltageSonar, distance);
-        if (Double.isNaN(distance))
+        double voltage=distanceSensorXSonar.getVoltage();
+        double distance=6+(voltage / 0.006);
+//        telemetry.log().add("voltage = %d, distance = %d", voltage, distance);
         return distance;
     }
     public double getRobotPositionXRev2m()
@@ -1656,7 +1655,7 @@ public class theColt extends LinearOpMode{
             telemetry.log().add("DISTANCE SENSOR X BROKE!!!!!!!");
             sleep(1d);
         }
-        if (distance>144)
+        if (distance>1440)
         {
             telemetry.log().add("overshot X distance");
             return lastPosX;
@@ -1666,7 +1665,21 @@ public class theColt extends LinearOpMode{
     }
     public double getRobotPositionX()
     {
-        return getRobotPositionXSonar();
+        double distanceSonar = getRobotPositionXSonar();
+        double distance2m = getRobotPositionXRev2m();
+        double distanceBest = (distanceSonar+distance2m)/2.0;   // Assume the average is best
+
+        if (distanceSonar < 13.0) {  // Sonar only works until 6 inches so prefer Rev2m below that
+            distanceBest = distance2m;
+//            telemetry.log().add("using Rev 2m distance");
+        }
+        if (distanceSonar > 35.0) { // Beyond X inches the Rev 2m doesn't work so prefer sonar
+            distanceBest = distanceSonar;
+        }
+        if (distance2m > 130) {
+            distanceBest = distanceSonar;   // If the Rev returns over X, ignore it
+        }
+        return distanceBest;
     }
     public double getRobotPositionY()
     {

@@ -54,16 +54,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
  */
 @TeleOp(name = "Sensor: MaxboticsDistance", group = "Sensor")
 
-public class MaxboticsDistanceTest extends LinearOpMode {
+public class MaxboticsDistanceTest extends theColt {
 
-    private AnalogInput sensorRange;
+    private AnalogInput sensorRangeMaxbotix;
     private DistanceSensor sensorRangeRev;
 
     @Override
     public void runOpMode() {
-        sensorRange = hardwareMap.get(AnalogInput.class, "maxbotix x");
+        sensorRangeMaxbotix = hardwareMap.get(AnalogInput.class, "maxbotix x");
         // you can use this as a regular DistanceSensor.
         sensorRangeRev = hardwareMap.get(DistanceSensor.class, "range sensor2");
+
+        INIT(hardwareMap);
 
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
@@ -76,16 +78,17 @@ public class MaxboticsDistanceTest extends LinearOpMode {
         waitForStart();
         while(opModeIsActive()) {
             // generic DistanceSensor methods.
-            telemetry.addData("deviceName",sensorRange.getDeviceName() );
-            telemetry.addData("voltage", String.format("%.2f v", sensorRange.getVoltage()));
+            telemetry.addData("deviceName",sensorRangeMaxbotix.getDeviceName() );
+            telemetry.addData("voltage", String.format("%.2f v", sensorRangeMaxbotix.getVoltage()));
             // Convert voltage to inches. 6" is the least possible
-            telemetry.addData("distance", String.format("%.2f inches", 6+(sensorRange.getVoltage()) / 0.006));
+            telemetry.addData("distance", String.format("%.2f inches", 6+(sensorRangeMaxbotix.getVoltage()) / 0.006));
 
             telemetry.addData("deviceName",sensorRangeRev.getDeviceName() );
             telemetry.addData("range", String.format("%.01f in", sensorRangeRev.getDistance(DistanceUnit.INCH)));
 
             // Rev2mDistanceSensor specific methods.
             telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
+            telemetry.addData( "getDistanceX", getRobotPositionX());
 
             telemetry.update();
         }
