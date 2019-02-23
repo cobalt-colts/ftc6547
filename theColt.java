@@ -221,7 +221,7 @@ public class theColt extends LinearOpMode{
         {
             distanceSensorY = hardwareMap.get(ModernRoboticsI2cRangeSensor.class, "range sensor");
             distanceSensorX = hardwareMap.get(Rev2mDistanceSensor.class, "range sensor2");
-            distanceSensorXSonar = hardwareMap.get(AnalogInput.class, "range sensor3");
+            distanceSensorXSonar = hardwareMap.get(AnalogInput.class, "maxbotix x");
             hanger = hardwareMap.get(DcMotor.class, "hanger");
             arm = hardwareMap.get(DcMotor.class, "arm");
             intake = hardwareMap.get(DcMotor.class, "intake");
@@ -1631,32 +1631,12 @@ public class theColt extends LinearOpMode{
         else angle+=180;
         return angle;
     }
-    public double getRobotPositionX()
+    public double getRobotPositionXSonar()
     {
-        double voltage=distanceSensorXSonar.getVoltage();
-        double distance=(voltage - .6050) / .0175;
-        telemetry.log().add("voltage = %d, distance = %d", voltage, distance);
+        double voltageSonar=distanceSensorXSonar.getVoltage();
+        double distance=6+(voltageSonar / 0.006);
+//        telemetry.log().add("voltage = %d, distance = %d", voltageSonar, distance);
         if (Double.isNaN(distance))
-        {
-            telemetry.log().add("DISTANCE VALUE WAS NaN");
-            return 2.5;
-        }
-        if (distance==0)
-        {
-            stopRobot();
-            lights.setPattern(RevBlinkinLedDriver.BlinkinPattern.FIRE_LARGE);
-            distanceSensorXSonar = hardwareMap.get(AnalogInput.class, "range sensor3");
-            voltage=distanceSensorXSonar.getVoltage();
-            distance=voltage; // Needs to match math at the start of the method
-            telemetry.log().add("DISTANCE SENSOR XSonar BROKE!!!!!!!");
-            sleep(1d);
-        }
-        if (distance>144)
-        {
-            telemetry.log().add("overshot XSonar distance");
-            return lastPosX;
-        }
-        lastPosX=distance;
         return distance;
     }
     public double getRobotPositionXRev2m()
@@ -1683,6 +1663,10 @@ public class theColt extends LinearOpMode{
         }
         lastPosX=distance;
         return distance;
+    }
+    public double getRobotPositionX()
+    {
+        return getRobotPositionXSonar();
     }
     public double getRobotPositionY()
     {

@@ -33,6 +33,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.hardware.rev.Rev2mDistanceSensor;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -56,10 +57,18 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 public class MaxboticsDistanceTest extends LinearOpMode {
 
     private AnalogInput sensorRange;
+    private DistanceSensor sensorRangeRev;
 
     @Override
     public void runOpMode() {
-        sensorRange = hardwareMap.get(AnalogInput.class, "range sensor3");
+        sensorRange = hardwareMap.get(AnalogInput.class, "maxbotix x");
+        // you can use this as a regular DistanceSensor.
+        sensorRangeRev = hardwareMap.get(DistanceSensor.class, "range sensor2");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor)sensorRangeRev;
+
 
         telemetry.addData(">>", "Press start to continue");
         telemetry.update();
@@ -69,7 +78,14 @@ public class MaxboticsDistanceTest extends LinearOpMode {
             // generic DistanceSensor methods.
             telemetry.addData("deviceName",sensorRange.getDeviceName() );
             telemetry.addData("voltage", String.format("%.2f v", sensorRange.getVoltage()));
-            telemetry.addData("distance", String.format("%.2f mm", (sensorRange.getVoltage() - .6050) / .0175));
+            // Convert voltage to inches. 6" is the least possible
+            telemetry.addData("distance", String.format("%.2f inches", 6+(sensorRange.getVoltage()) / 0.006));
+
+            telemetry.addData("deviceName",sensorRangeRev.getDeviceName() );
+            telemetry.addData("range", String.format("%.01f in", sensorRangeRev.getDistance(DistanceUnit.INCH)));
+
+            // Rev2mDistanceSensor specific methods.
+            telemetry.addData("did time out", Boolean.toString(sensorTimeOfFlight.didTimeoutOccur()));
 
             telemetry.update();
         }
